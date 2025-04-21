@@ -1,4 +1,3 @@
-
 import React, { useEffect, useRef, useState } from 'react';
 
 interface MapPoint {
@@ -17,8 +16,8 @@ interface MapProps {
 }
 
 const Map: React.FC<MapProps> = ({ 
-  center = { lat: 40.7128, lng: -74.006 },
-  zoom = 14,
+  center = { lat: 37.0902, lng: -95.7129 },
+  zoom = 4,
   points = [],
   onDriverSelect
 }) => {
@@ -26,10 +25,7 @@ const Map: React.FC<MapProps> = ({
   const [isMapLoaded, setIsMapLoaded] = useState(false);
 
   useEffect(() => {
-    // In a real implementation, this would initialize an actual map library
-    // like Google Maps, Mapbox, Leaflet, etc.
     if (mapRef.current) {
-      // Simulate map loading
       const timer = setTimeout(() => {
         setIsMapLoaded(true);
       }, 1000);
@@ -40,24 +36,21 @@ const Map: React.FC<MapProps> = ({
   
   return (
     <div className="relative w-full h-full rounded-lg overflow-hidden">
-      {/* Map Container */}
       <div 
         ref={mapRef} 
         className="w-full h-full bg-slate-200" 
         style={{ 
-          backgroundImage: "url('https://maps.googleapis.com/maps/api/staticmap?center=40.7128,-74.006&zoom=14&size=800x600&scale=2&maptype=roadmap&style=feature:all|element:labels|visibility:on&style=feature:administrative|element:geometry|visibility:off&style=feature:road|element:geometry|color:0xffffff&key=YOUR_KEY_HERE')",
+          backgroundImage: `url('https://maps.googleapis.com/maps/api/staticmap?center=37.0902,-95.7129&zoom=4&size=800x600&scale=2&maptype=roadmap&style=feature:all|element:labels|visibility:on&style=feature:administrative|element:geometry|visibility:off&style=feature:road|element:geometry|color:0xffffff&key=YOUR_KEY_HERE')`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
         }}
       >
-        {/* Loading indicator */}
         {!isMapLoaded && (
           <div className="absolute inset-0 flex items-center justify-center bg-background/50">
             <div className="animate-pulse-gentle text-primary">Loading map...</div>
           </div>
         )}
         
-        {/* Map Points */}
         {isMapLoaded && points.map(point => (
           <div 
             key={point.id}
@@ -72,7 +65,6 @@ const Map: React.FC<MapProps> = ({
               ${point.type === 'driver' && 'hover:scale-110 transition-transform'}
             `}
             style={{
-              // Randomize positions for demo purposes
               top: `${Math.random() * 60 + 20}%`,
               left: `${Math.random() * 60 + 20}%`,
             }}
@@ -98,7 +90,6 @@ const Map: React.FC<MapProps> = ({
         ))}
       </div>
       
-      {/* Map Controls */}
       <div className="absolute bottom-4 right-4 flex flex-col gap-2">
         <button className="w-10 h-10 bg-white rounded-full shadow-md flex items-center justify-center text-primary hover:bg-gray-50">
           <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -112,7 +103,6 @@ const Map: React.FC<MapProps> = ({
         </button>
       </div>
       
-      {/* Legend */}
       <div className="absolute top-4 right-4 bg-white p-2 rounded-lg shadow-md text-xs">
         <div className="flex items-center mb-1">
           <div className="w-3 h-3 rounded-full bg-primary mr-2"></div>
