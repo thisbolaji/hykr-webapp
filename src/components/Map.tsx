@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { MapContainer, TileLayer, Marker, Popup, ZoomControl } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, ZoomControl, MapContainerProps } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 
@@ -15,6 +15,12 @@ L.Icon.Default.mergeOptions({
   iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
 });
+
+// Define custom map container props type that includes center
+interface CustomMapProps extends MapContainerProps {
+  center?: [number, number];
+  attributionControl?: boolean;
+}
 
 interface MapPoint {
   id: string;
@@ -59,17 +65,17 @@ const Map: React.FC<MapProps> = ({
       `,
       iconSize: [24, 24],
       iconAnchor: [12, 12],
-    }) as L.DivIcon;
+    });
   };
 
   return (
     <div className="relative w-full h-full rounded-lg overflow-hidden">
       <MapContainer
-        center={[center.lat, center.lng] as [number, number]}
+        center={[center.lat, center.lng] as any}
         zoom={zoom}
         className="h-full w-full"
         zoomControl={false}
-        attributionControl={true}
+        attributionControl={true as any}
       >
         <ZoomControl position="topright" />
         <TileLayer
@@ -80,7 +86,7 @@ const Map: React.FC<MapProps> = ({
         {points.map((point) => (
           <Marker
             key={point.id}
-            position={[point.lat, point.lng] as [number, number]}
+            position={[point.lat, point.lng] as any}
             icon={createCustomIcon(point.type, point.status)}
             eventHandlers={{
               click: () => {
@@ -88,7 +94,7 @@ const Map: React.FC<MapProps> = ({
                   onDriverSelect?.(point.id);
                 }
               },
-            }}
+            } as any}
           >
             <Popup>
               <div className="p-2 text-sm">

@@ -1,6 +1,6 @@
 
 import React, { useEffect, useRef, useState } from "react";
-import { MapContainer, TileLayer, Marker } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, MapContainerProps } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
@@ -32,7 +32,26 @@ const createCarIcon = () =>
     className: "",
     iconSize: [16, 16],
     iconAnchor: [8, 8],
-  }) as L.DivIcon;
+  });
+
+// Define custom map container props type that includes center
+interface CustomMapProps extends MapContainerProps {
+  center?: [number, number];
+  attributionControl?: boolean;
+}
+
+// Define custom tile layer props type
+interface CustomTileLayerProps {
+  url: string;
+  attribution?: string;
+}
+
+// Define custom marker props type
+interface CustomMarkerProps {
+  position: [number, number];
+  icon?: L.DivIcon | L.Icon;
+  eventHandlers?: any;
+}
 
 const HomeHeroMap: React.FC = () => {
   const [cars, setCars] = useState(
@@ -68,7 +87,7 @@ const HomeHeroMap: React.FC = () => {
   return (
     <div className="w-full h-56 md:w-[360px] md:h-[260px] rounded-xl shadow-lg overflow-hidden border bg-white relative">
       <MapContainer
-        center={[baseLat, baseLng] as [number, number]}
+        center={[baseLat, baseLng] as any}
         zoom={14}
         className="w-full h-full"
         dragging={false}
@@ -88,7 +107,7 @@ const HomeHeroMap: React.FC = () => {
         {cars.map((car) => (
           <Marker
             key={car.id}
-            position={[car.lat, car.lng] as [number, number]}
+            position={[car.lat, car.lng] as any}
             icon={createCarIcon()}
           />
         ))}
