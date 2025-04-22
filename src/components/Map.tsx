@@ -63,10 +63,11 @@ const Map: React.FC<MapProps> = ({
   return (
     <div className="relative w-full h-full rounded-lg overflow-hidden">
       <MapContainer
-        center={[center.lat, center.lng]}
+        center={[center.lat, center.lng]} 
         zoom={zoom}
         className="h-full w-full"
         zoomControl={false}
+        attributionControl={true}
       >
         <ZoomControl position="topright" />
         <TileLayer
