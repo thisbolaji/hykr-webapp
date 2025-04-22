@@ -1,7 +1,6 @@
 
-import React, { useEffect, useRef, useState } from 'react';
-import mapboxgl from 'mapbox-gl';
-import 'mapbox-gl/dist/mapbox-gl.css';
+import React from 'react';
+import { GoogleMap, useJsApiLoader, Marker } from '@react-google-maps/api';
 
 interface MapPoint {
   id: string;
@@ -24,97 +23,79 @@ const Map: React.FC<MapProps> = ({
   points = [],
   onDriverSelect
 }) => {
-  const mapContainer = useRef<HTMLDivElement>(null);
-  const map = useRef<mapboxgl.Map | null>(null);
-  const markers = useRef<{ [key: string]: mapboxgl.Marker }>({});
-  const [isMapLoaded, setIsMapLoaded] = useState(false);
+  const { isLoaded } = useJsApiLoader({
+    id: 'google-map-script',
+    googleMapsApiKey: 'YOUR_GOOGLE_MAPS_API_KEY' // Replace with your Google Maps API key
+  });
 
-  // Initialize map
-  useEffect(() => {
-    if (!mapContainer.current || map.current) return;
-
-    mapboxgl.accessToken = 'YOUR_MAPBOX_PUBLIC_TOKEN'; // Replace with your Mapbox public token
-    
-    map.current = new mapboxgl.Map({
-      container: mapContainer.current,
-      style: 'mapbox://styles/mapbox/light-v11',
-      center: [center.lng, center.lat],
-      zoom: zoom,
-      pitchWithRotate: false,
-      attributionControl: false
-    });
-
-    map.current.addControl(
-      new mapboxgl.NavigationControl({ showCompass: false }),
-      'bottom-right'
+  if (!isLoaded) {
+    return (
+      <div className="absolute inset-0 flex items-center justify-center bg-background/50">
+        <div className="animate-pulse-gentle text-primary">Loading map...</div>
+      </div>
     );
+  }
 
-    map.current.on('load', () => {
-      setIsMapLoaded(true);
-    });
+  const createMarkerIcon = (type: 'rider' | 'driver', status?: 'available' | 'busy' | 'selected') => {
+    const color = type === 'rider' 
+      ? '#9b87f5' // primary color for rider
+      : status === 'available' 
+        ? '#22c55e' // green for available driver
+        : status === 'selected'
+          ? '#9b87f5' // primary color for selected driver
+          : '#9ca3af'; // gray for busy driver
 
-    return () => {
-      Object.values(markers.current).forEach(marker => marker.remove());
-      map.current?.remove();
+    return {
+      path: type === 'driver' 
+        ? 'M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z'
+        : 'M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z',
+      fillColor: color,
+      fillOpacity: 1,
+      strokeWeight: 1,
+      strokeColor: '#ffffff',
+      scale: 1.5,
     };
-  }, []);
-
-  // Update markers when points change
-  useEffect(() => {
-    if (!map.current || !isMapLoaded) return;
-
-    // Remove existing markers
-    Object.values(markers.current).forEach(marker => marker.remove());
-    markers.current = {};
-
-    // Add new markers
-    points.forEach(point => {
-      const el = document.createElement('div');
-      el.className = `w-8 h-8 rounded-full flex items-center justify-center cursor-pointer
-        ${point.type === 'driver' 
-          ? point.status === 'available' 
-            ? 'bg-hykr-green text-white' 
-            : point.status === 'selected'
-              ? 'bg-primary text-white ring-2 ring-white' 
-              : 'bg-gray-400 text-white' 
-          : 'bg-primary text-white'}
-        ${point.type === 'driver' && 'hover:scale-110 transition-transform'}
-      `;
-
-      // Add icon
-      el.innerHTML = point.type === 'driver' 
-        ? `<svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="12" cy="12" r="10" />
-            <path d="M8 12h8" />
-            <path d="M12 8v8" />
-          </svg>`
-        : `<svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" />
-            <circle cx="12" cy="10" r="3" />
-          </svg>`;
-
-      if (point.type === 'driver' && point.status === 'available') {
-        el.addEventListener('click', () => onDriverSelect?.(point.id));
-      }
-
-      const marker = new mapboxgl.Marker({ element: el })
-        .setLngLat([point.lng, point.lat])
-        .addTo(map.current!);
-
-      markers.current[point.id] = marker;
-    });
-  }, [points, isMapLoaded]);
+  };
 
   return (
     <div className="relative w-full h-full rounded-lg overflow-hidden">
-      <div ref={mapContainer} className="w-full h-full" />
-      
-      {!isMapLoaded && (
-        <div className="absolute inset-0 flex items-center justify-center bg-background/50">
-          <div className="animate-pulse-gentle text-primary">Loading map...</div>
-        </div>
-      )}
-      
+      <GoogleMap
+        mapContainerStyle={{ width: '100%', height: '100%' }}
+        center={center}
+        zoom={zoom}
+        options={{
+          styles: [
+            {
+              featureType: 'all',
+              elementType: 'geometry',
+              stylers: [{ lightness: 20 }]
+            },
+            {
+              featureType: 'water',
+              elementType: 'geometry',
+              stylers: [{ hue: '#00aaff' }, { lightness: 50 }]
+            }
+          ],
+          disableDefaultUI: true,
+          zoomControl: true,
+          scrollwheel: true,
+          gestureHandling: 'greedy'
+        }}
+      >
+        {points.map((point) => (
+          <Marker
+            key={point.id}
+            position={{ lat: point.lat, lng: point.lng }}
+            icon={createMarkerIcon(point.type, point.status)}
+            onClick={() => {
+              if (point.type === 'driver' && point.status === 'available') {
+                onDriverSelect?.(point.id);
+              }
+            }}
+          />
+        ))}
+      </GoogleMap>
+
       <div className="absolute top-4 right-4 bg-white p-2 rounded-lg shadow-md text-xs">
         <div className="flex items-center mb-1">
           <div className="w-3 h-3 rounded-full bg-primary mr-2"></div>
