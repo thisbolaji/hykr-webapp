@@ -1,7 +1,16 @@
 
-import React, { useEffect, useRef } from 'react';
-import mapboxgl from 'mapbox-gl';
-import 'mapbox-gl/dist/mapbox-gl.css';
+import React from 'react';
+import { MapContainer, TileLayer, Marker, Popup, ZoomControl } from 'react-leaflet';
+import 'leaflet/dist/leaflet.css';
+import L from 'leaflet';
+
+// Fix for default markers in Leaflet
+delete (L.Icon.Default.prototype as any)._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
+  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+});
 
 interface MapPoint {
   id: string;
@@ -20,146 +29,79 @@ interface MapProps {
 
 const Map: React.FC<MapProps> = ({ 
   center = { lat: 37.0902, lng: -95.7129 },
-  zoom = 4,
+  zoom = 13,
   points = [],
   onDriverSelect
 }) => {
-  const mapContainer = useRef<HTMLDivElement>(null);
-  const map = useRef<mapboxgl.Map | null>(null);
-  const markers = useRef<mapboxgl.Marker[]>([]);
-  const popups = useRef<mapboxgl.Popup[]>([]);
+  const createCustomIcon = (type: 'rider' | 'driver', status?: string) => {
+    const color = type === 'rider' 
+      ? '#9b87f5'
+      : status === 'available' 
+        ? '#22c55e'
+        : status === 'selected'
+          ? '#9b87f5'
+          : '#9ca3af';
 
-  useEffect(() => {
-    if (!mapContainer.current) return;
-
-    mapboxgl.accessToken = 'YOUR_MAPBOX_PUBLIC_TOKEN';
-    
-    map.current = new mapboxgl.Map({
-      container: mapContainer.current,
-      style: 'mapbox://styles/mapbox/light-v11',
-      center: [center.lng, center.lat],
-      zoom: zoom,
-      pitch: 45,
-      bearing: 0,
+    return L.divIcon({
+      className: 'custom-icon',
+      html: `
+        <div style="
+          width: 24px;
+          height: 24px;
+          background: ${color};
+          border: 2px solid white;
+          border-radius: 50%;
+          box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+          cursor: ${type === 'driver' && status === 'available' ? 'pointer' : 'default'};
+        "></div>
+      `,
+      iconSize: [24, 24],
+      iconAnchor: [12, 12],
     });
-
-    // Add navigation and zoom controls
-    map.current.addControl(
-      new mapboxgl.NavigationControl(),
-      'top-right'
-    );
-
-    // Add fullscreen control
-    map.current.addControl(
-      new mapboxgl.FullscreenControl(),
-      'top-right'
-    );
-
-    // Enable terrain if available
-    map.current.on('style.load', () => {
-      map.current?.setTerrain({ source: 'mapbox-dem', exaggeration: 1.5 });
-      map.current?.addSource('mapbox-dem', {
-        'type': 'raster-dem',
-        'url': 'mapbox://mapbox.mapbox-terrain-dem-v1',
-        'tileSize': 512,
-        'maxzoom': 14
-      });
-    });
-
-    return () => {
-      popups.current.forEach(popup => popup.remove());
-      markers.current.forEach(marker => marker.remove());
-      map.current?.remove();
-    };
-  }, [center.lat, center.lng, zoom]);
-
-  // Update markers when points change
-  useEffect(() => {
-    if (!map.current) return;
-
-    // Remove existing markers and popups
-    markers.current.forEach(marker => marker.remove());
-    popups.current.forEach(popup => popup.remove());
-    markers.current = [];
-    popups.current = [];
-
-    // Add new markers with enhanced interactivity
-    points.forEach(point => {
-      const color = point.type === 'rider' 
-        ? '#9b87f5'
-        : point.status === 'available' 
-          ? '#22c55e'
-          : point.status === 'selected'
-            ? '#9b87f5'
-            : '#9ca3af';
-
-      // Create marker element
-      const el = document.createElement('div');
-      el.className = 'marker transition-all duration-300 hover:scale-125';
-      el.style.width = '24px';
-      el.style.height = '24px';
-      el.style.borderRadius = '50%';
-      el.style.background = color;
-      el.style.border = '2px solid white';
-      el.style.cursor = point.type === 'driver' && point.status === 'available' ? 'pointer' : 'default';
-      el.style.boxShadow = '0 2px 4px rgba(0,0,0,0.2)';
-
-      // Create popup
-      const popup = new mapboxgl.Popup({
-        closeButton: false,
-        closeOnClick: false,
-        offset: 25,
-        className: 'rounded-lg shadow-lg'
-      })
-      .setHTML(`
-        <div class="p-2 text-sm">
-          <div class="font-medium">${point.type === 'rider' ? 'Pickup Location' : 'Driver'}</div>
-          <div class="text-muted-foreground">
-            ${point.status ? `Status: ${point.status.charAt(0).toUpperCase() + point.status.slice(1)}` : ''}
-          </div>
-        </div>
-      `);
-
-      // Create and add marker
-      const marker = new mapboxgl.Marker(el)
-        .setLngLat([point.lng, point.lat])
-        .addTo(map.current!);
-
-      // Add hover events for popup
-      el.addEventListener('mouseenter', () => {
-        marker.setPopup(popup);
-        popup.addTo(map.current!);
-      });
-
-      el.addEventListener('mouseleave', () => {
-        popup.remove();
-      });
-
-      // Add click event for available drivers
-      if (point.type === 'driver' && point.status === 'available') {
-        el.addEventListener('click', () => {
-          // Fly to the clicked point with animation
-          map.current?.flyTo({
-            center: [point.lng, point.lat],
-            zoom: 14,
-            duration: 1500,
-            essential: true
-          });
-          
-          onDriverSelect?.(point.id);
-        });
-      }
-
-      markers.current.push(marker);
-      popups.current.push(popup);
-    });
-  }, [points, onDriverSelect]);
+  };
 
   return (
     <div className="relative w-full h-full rounded-lg overflow-hidden">
-      <div ref={mapContainer} className="absolute inset-0" />
+      <MapContainer
+        center={[center.lat, center.lng]}
+        zoom={zoom}
+        className="h-full w-full"
+        zoomControl={false}
+      >
+        <ZoomControl position="topright" />
+        <TileLayer
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        />
+        
+        {points.map((point) => (
+          <Marker
+            key={point.id}
+            position={[point.lat, point.lng]}
+            icon={createCustomIcon(point.type, point.status)}
+            eventHandlers={{
+              click: () => {
+                if (point.type === 'driver' && point.status === 'available') {
+                  onDriverSelect?.(point.id);
+                }
+              },
+            }}
+          >
+            <Popup>
+              <div className="p-2 text-sm">
+                <div className="font-medium">
+                  {point.type === 'rider' ? 'Pickup Location' : 'Driver'}
+                </div>
+                <div className="text-muted-foreground">
+                  {point.status ? `Status: ${point.status.charAt(0).toUpperCase() + point.status.slice(1)}` : ''}
+                </div>
+              </div>
+            </Popup>
+          </Marker>
+        ))}
+      </MapContainer>
 
-      <div className="absolute top-4 left-4 bg-white p-3 rounded-lg shadow-md space-y-2">
+      <div className="absolute top-4 left-4 bg-white p-3 rounded-lg shadow-md space-y-2 z-[1000]">
         <div className="text-sm font-medium mb-2">Map Legend</div>
         <div className="flex items-center gap-2">
           <div className="w-3 h-3 rounded-full bg-primary"></div>
