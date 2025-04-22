@@ -91,9 +91,9 @@ const HomeHeroMap: React.FC = () => {
     return () => clearInterval(interval);
   }, []);
 
-  // 2x size: Container width/height
+  // Exact size: 720px by 512px
   return (
-    <div className="w-full h-[2000px] md:w-[2880px] md:h-[2080px] rounded-2xl shadow-2xl overflow-hidden border bg-white relative">
+    <div className="w-[720px] h-[512px] rounded-2xl shadow-2xl overflow-hidden border bg-white relative">
       <MapContainer
         center={[baseLat, baseLng]}
         zoom={14}
@@ -113,13 +113,14 @@ const HomeHeroMap: React.FC = () => {
         />
         {/* User location: blue dot at center */}
         <Marker
+          key="user"
           position={[baseLat, baseLng]}
           icon={createUserIcon()}
         />
         {/* Cars */}
         {cars.map((car) => (
           <Marker
-            key={car.id}
+            key={`car-${car.id}`}
             position={[car.lat, car.lng]}
             icon={createCarIcon(car.dir)}
           />
