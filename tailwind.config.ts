@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -53,12 +54,9 @@ export default {
 					foreground: 'hsl(var(--card-foreground))'
 				},
 				hykr: {
-					teal: '#20B2AA',
-					'teal-light': '#B2DFDB',
-					'teal-dark': '#006D6A',
-					green: '#4CAF50',
-					'green-light': '#C8E6C9',
-					'green-dark': '#2E7D32',
+					blue: '#007cff',
+					'blue-light': '#cee6ff',
+					'blue-dark': '#005bb5',
 					warning: '#FF5252',
 				},
 				sidebar: {

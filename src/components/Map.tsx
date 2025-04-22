@@ -35,12 +35,12 @@ const Map: React.FC<MapProps> = ({
 }) => {
   const createCustomIcon = (type: 'rider' | 'driver', status?: string) => {
     const color = type === 'rider' 
-      ? '#9b87f5'
+      ? '#007cff'
       : status === 'available' 
-        ? '#22c55e'
+        ? '#cee6ff'
         : status === 'selected'
-          ? '#9b87f5'
-          : '#9ca3af';
+          ? '#007cff'
+          : '#b5b5b5';
 
     return L.divIcon({
       className: 'custom-icon',
@@ -51,7 +51,7 @@ const Map: React.FC<MapProps> = ({
           background: ${color};
           border: 2px solid white;
           border-radius: 50%;
-          box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+          box-shadow: 0 2px 4px rgba(0,0,0,0.17);
           cursor: ${type === 'driver' && status === 'available' ? 'pointer' : 'default'};
         "></div>
       `,
@@ -63,14 +63,16 @@ const Map: React.FC<MapProps> = ({
   return (
     <div className="relative w-full h-full rounded-lg overflow-hidden">
       <MapContainer
-        center={[center.lat, center.lng]} 
+        center={[center.lat, center.lng]}
         zoom={zoom}
         className="h-full w-full"
         zoomControl={false}
-        attributionControl={true}
+        attributionControl={true as any}
+        // Type casting to satisfy react-leaflet MapContainerProps typings
       >
         <ZoomControl position="topright" />
         <TileLayer
+          // @ts-ignore: attribution is a valid prop, but types can be strict
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
@@ -79,7 +81,7 @@ const Map: React.FC<MapProps> = ({
           <Marker
             key={point.id}
             position={[point.lat, point.lng]}
-            icon={createCustomIcon(point.type, point.status)}
+            icon={createCustomIcon(point.type, point.status) as any}
             eventHandlers={{
               click: () => {
                 if (point.type === 'driver' && point.status === 'available') {
@@ -109,11 +111,11 @@ const Map: React.FC<MapProps> = ({
           <span className="text-xs">Your Location</span>
         </div>
         <div className="flex items-center gap-2">
-          <div className="w-3 h-3 rounded-full bg-[#22c55e]"></div>
+          <div className="w-3 h-3 rounded-full" style={{ background: '#cee6ff' }}></div>
           <span className="text-xs">Available Drivers</span>
         </div>
         <div className="flex items-center gap-2">
-          <div className="w-3 h-3 rounded-full bg-[#9ca3af]"></div>
+          <div className="w-3 h-3 rounded-full" style={{ background: '#b5b5b5' }}></div>
           <span className="text-xs">Busy Drivers</span>
         </div>
       </div>
@@ -122,3 +124,4 @@ const Map: React.FC<MapProps> = ({
 };
 
 export default Map;
+
