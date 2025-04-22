@@ -2,31 +2,37 @@
 import React, { useEffect, useRef, useState } from "react";
 import { MapContainer, TileLayer, Marker } from "react-leaflet";
 import L from "leaflet";
+import "leaflet/dist/leaflet.css";
 
+// Brand colors
+const HYKR_BLUE = "#007cff";
+const HYKR_BLUE_LIGHT = "#cee6ff";
+const HYKR_BLACK = "#000000";
+
+// Map base coordinates (NYC for demo)
 const baseLat = 40.7128;
 const baseLng = -74.006;
 const NUM_CARS = 6;
-const CAR_COLOR = "#007cff";
 
 function randomWobble(num: number) {
-  // returns number in range [-0.003, 0.003] for micro position changes
-  return (Math.random()-0.5) * 0.006 * num;
+  // returns small random offset for micro position changes
+  return (Math.random() - 0.5) * 0.006 * num;
 }
 
 const createCarIcon = () =>
   L.divIcon({
     html: `<div style="
-      background: ${CAR_COLOR};
+      background: ${HYKR_BLUE_LIGHT};
       width: 16px;
       height: 16px;
       border-radius: 50%;
-      border: 1.5px solid #fff;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.14);
+      border: 2.5px solid ${HYKR_BLUE};
+      box-shadow: 0 2px 4px rgba(0,0,0,0.12);
       "></div>`,
     className: "",
     iconSize: [16, 16],
     iconAnchor: [8, 8],
-  });
+  }) as L.DivIcon;
 
 const HomeHeroMap: React.FC = () => {
   const [cars, setCars] = useState(
@@ -38,12 +44,12 @@ const HomeHeroMap: React.FC = () => {
     }))
   );
 
-  // Animate: every 1.5s move cars in random directions
+  // Animate: every 1.2s move cars randomly
   useEffect(() => {
     const interval = setInterval(() => {
       setCars((prev) =>
         prev.map((car, i) => {
-          // move the car a little
+          // Random walk
           const direction = car.dir + (Math.random() - 0.5) * 45;
           const lat = car.lat + 0.0008 * Math.sin((direction * Math.PI) / 180);
           const lng = car.lng + 0.0008 * Math.cos((direction * Math.PI) / 180);
@@ -60,9 +66,9 @@ const HomeHeroMap: React.FC = () => {
   }, []);
 
   return (
-    <div className="w-full h-56 md:w-[360px] md:h-[260px] rounded-xl shadow-lg overflow-hidden border bg-white">
+    <div className="w-full h-56 md:w-[360px] md:h-[260px] rounded-xl shadow-lg overflow-hidden border bg-white relative">
       <MapContainer
-        center={[baseLat, baseLng]}
+        center={[baseLat, baseLng] as [number, number]}
         zoom={14}
         className="w-full h-full"
         dragging={false}
@@ -76,14 +82,33 @@ const HomeHeroMap: React.FC = () => {
         style={{ filter: "grayscale(20%)" }}
       >
         <TileLayer
-          // @ts-ignore
-          attribution=""
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          attribution=""
         />
         {cars.map((car) => (
-          <Marker key={car.id} position={[car.lat, car.lng]} icon={createCarIcon() as any} />
+          <Marker
+            key={car.id}
+            position={[car.lat, car.lng] as [number, number]}
+            icon={createCarIcon()}
+          />
         ))}
       </MapContainer>
+      {/* Legend overlay, floating in top left */}
+      <div className="absolute top-3 left-3 bg-white rounded-lg shadow p-3 z-[1000] min-w-[140px] pointer-events-none">
+        <div className="font-semibold text-[15px] text-[#222] mb-2">Map Legend</div>
+        <div className="flex items-center gap-2 mb-1">
+          <span className="w-3 h-3 rounded-full" style={{ background: HYKR_BLUE }}></span>
+          <span className="text-[13px] text-[#222]">Your Location</span>
+        </div>
+        <div className="flex items-center gap-2 mb-1">
+          <span className="w-3 h-3 rounded-full" style={{ background: HYKR_BLUE_LIGHT }}></span>
+          <span className="text-[13px] text-[#222]">Available Drivers</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="w-3 h-3 rounded-full bg-[#b5b5b5]"></span>
+          <span className="text-[13px] text-[#222]">Busy Drivers</span>
+        </div>
+      </div>
     </div>
   );
 };
