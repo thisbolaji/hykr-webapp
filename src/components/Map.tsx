@@ -1,4 +1,7 @@
+
 import React, { useEffect, useRef, useState } from 'react';
+import mapboxgl from 'mapbox-gl';
+import 'mapbox-gl/dist/mapbox-gl.css';
 
 interface MapPoint {
   id: string;
@@ -21,87 +24,96 @@ const Map: React.FC<MapProps> = ({
   points = [],
   onDriverSelect
 }) => {
-  const mapRef = useRef<HTMLDivElement>(null);
+  const mapContainer = useRef<HTMLDivElement>(null);
+  const map = useRef<mapboxgl.Map | null>(null);
+  const markers = useRef<{ [key: string]: mapboxgl.Marker }>({});
   const [isMapLoaded, setIsMapLoaded] = useState(false);
 
+  // Initialize map
   useEffect(() => {
-    if (mapRef.current) {
-      const timer = setTimeout(() => {
-        setIsMapLoaded(true);
-      }, 1000);
-      
-      return () => clearTimeout(timer);
-    }
+    if (!mapContainer.current || map.current) return;
+
+    mapboxgl.accessToken = 'YOUR_MAPBOX_PUBLIC_TOKEN'; // Replace with your Mapbox public token
+    
+    map.current = new mapboxgl.Map({
+      container: mapContainer.current,
+      style: 'mapbox://styles/mapbox/light-v11',
+      center: [center.lng, center.lat],
+      zoom: zoom,
+      pitchWithRotate: false,
+      attributionControl: false
+    });
+
+    map.current.addControl(
+      new mapboxgl.NavigationControl({ showCompass: false }),
+      'bottom-right'
+    );
+
+    map.current.on('load', () => {
+      setIsMapLoaded(true);
+    });
+
+    return () => {
+      Object.values(markers.current).forEach(marker => marker.remove());
+      map.current?.remove();
+    };
   }, []);
-  
+
+  // Update markers when points change
+  useEffect(() => {
+    if (!map.current || !isMapLoaded) return;
+
+    // Remove existing markers
+    Object.values(markers.current).forEach(marker => marker.remove());
+    markers.current = {};
+
+    // Add new markers
+    points.forEach(point => {
+      const el = document.createElement('div');
+      el.className = `w-8 h-8 rounded-full flex items-center justify-center cursor-pointer
+        ${point.type === 'driver' 
+          ? point.status === 'available' 
+            ? 'bg-hykr-green text-white' 
+            : point.status === 'selected'
+              ? 'bg-primary text-white ring-2 ring-white' 
+              : 'bg-gray-400 text-white' 
+          : 'bg-primary text-white'}
+        ${point.type === 'driver' && 'hover:scale-110 transition-transform'}
+      `;
+
+      // Add icon
+      el.innerHTML = point.type === 'driver' 
+        ? `<svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10" />
+            <path d="M8 12h8" />
+            <path d="M12 8v8" />
+          </svg>`
+        : `<svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" />
+            <circle cx="12" cy="10" r="3" />
+          </svg>`;
+
+      if (point.type === 'driver' && point.status === 'available') {
+        el.addEventListener('click', () => onDriverSelect?.(point.id));
+      }
+
+      const marker = new mapboxgl.Marker({ element: el })
+        .setLngLat([point.lng, point.lat])
+        .addTo(map.current!);
+
+      markers.current[point.id] = marker;
+    });
+  }, [points, isMapLoaded]);
+
   return (
     <div className="relative w-full h-full rounded-lg overflow-hidden">
-      <div 
-        ref={mapRef} 
-        className="w-full h-full bg-slate-200" 
-        style={{ 
-          backgroundImage: `url('https://maps.googleapis.com/maps/api/staticmap?center=37.0902,-95.7129&zoom=4&size=800x600&scale=2&maptype=roadmap&style=feature:all|element:labels|visibility:on&style=feature:administrative|element:geometry|visibility:off&style=feature:road|element:geometry|color:0xffffff&key=YOUR_KEY_HERE')`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-        }}
-      >
-        {!isMapLoaded && (
-          <div className="absolute inset-0 flex items-center justify-center bg-background/50">
-            <div className="animate-pulse-gentle text-primary">Loading map...</div>
-          </div>
-        )}
-        
-        {isMapLoaded && points.map(point => (
-          <div 
-            key={point.id}
-            className={`absolute w-8 h-8 transform -translate-x-1/2 -translate-y-1/2 rounded-full flex items-center justify-center cursor-pointer
-              ${point.type === 'driver' 
-                ? point.status === 'available' 
-                  ? 'bg-hykr-green text-white' 
-                  : point.status === 'selected'
-                    ? 'bg-primary text-white ring-2 ring-white' 
-                    : 'bg-gray-400 text-white' 
-                : 'bg-primary text-white'}
-              ${point.type === 'driver' && 'hover:scale-110 transition-transform'}
-            `}
-            style={{
-              top: `${Math.random() * 60 + 20}%`,
-              left: `${Math.random() * 60 + 20}%`,
-            }}
-            onClick={() => {
-              if (point.type === 'driver' && point.status === 'available' && onDriverSelect) {
-                onDriverSelect(point.id);
-              }
-            }}
-          >
-            {point.type === 'driver' ? (
-              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <circle cx="12" cy="12" r="10" />
-                <path d="M8 12h8" />
-                <path d="M12 8v8" />
-              </svg>
-            ) : (
-              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" />
-                <circle cx="12" cy="10" r="3" />
-              </svg>
-            )}
-          </div>
-        ))}
-      </div>
+      <div ref={mapContainer} className="w-full h-full" />
       
-      <div className="absolute bottom-4 right-4 flex flex-col gap-2">
-        <button className="w-10 h-10 bg-white rounded-full shadow-md flex items-center justify-center text-primary hover:bg-gray-50">
-          <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-          </svg>
-        </button>
-        <button className="w-10 h-10 bg-white rounded-full shadow-md flex items-center justify-center text-primary hover:bg-gray-50">
-          <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
-          </svg>
-        </button>
-      </div>
+      {!isMapLoaded && (
+        <div className="absolute inset-0 flex items-center justify-center bg-background/50">
+          <div className="animate-pulse-gentle text-primary">Loading map...</div>
+        </div>
+      )}
       
       <div className="absolute top-4 right-4 bg-white p-2 rounded-lg shadow-md text-xs">
         <div className="flex items-center mb-1">
