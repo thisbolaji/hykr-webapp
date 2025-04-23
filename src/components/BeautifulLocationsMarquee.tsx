@@ -1,3 +1,4 @@
+
 import React from "react";
 
 const locations = [
@@ -34,7 +35,7 @@ const locations = [
   {
     name: "Niagara Falls, NY",
     image:
-      "https://images.unsplash.com/photo-1470008169832-bd94e5ade6a4?fit=crop&w=900&q=80"
+      "https://images.unsplash.com/photo-1542372147193-d1e7fc16f9cf?fit=crop&w=900&q=80"
   },
   {
     name: "Zion National Park, UT",
@@ -44,7 +45,7 @@ const locations = [
   {
     name: "Times Square, NY",
     image:
-      "https://images.unsplash.com/photo-1482938289607-e9573fc25ebb?fit=crop&w=900&q=80"
+      "https://images.unsplash.com/photo-1518895949257-7621c3c786d7?fit=crop&w=900&q=80"
   },
   {
     name: "Mount Rainier, WA",
