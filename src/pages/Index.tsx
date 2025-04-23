@@ -5,6 +5,7 @@ import { HykrLogo } from "@/components/HykrLogo";
 import HomeHeroMap from "@/components/HomeHeroMap";
 import { Quote, User, Users } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import BeautifulLocationsMarquee from "@/components/BeautifulLocationsMarquee";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -388,6 +389,10 @@ const Index = () => {
         </div>
       </section>
       {/* ----------------- END TESTIMONIALS SECTION ------------------ */}
+
+      {/* ------------------ BEAUTIFUL LOCATIONS MARQUEE ------------------ */}
+      <BeautifulLocationsMarquee />
+      {/* ----------------- END BEAUTIFUL LOCATIONS MARQUEE ------------------ */}
 
       {/* CTA Section */}
       <section className="py-16 px-6 bg-gradient-to-r from-primary/20 to-[#cee6ff]/20">
