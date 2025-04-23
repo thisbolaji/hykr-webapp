@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { HykrLogo } from "@/components/HykrLogo";
 import HomeHeroMap from "@/components/HomeHeroMap";
 import { Quote, User, Users } from "lucide-react";
-import { Avatar, AvatarImage, AvatarFallback } from "@nextui-org/react";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
 const Index = () => {
   const navigate = useNavigate();
