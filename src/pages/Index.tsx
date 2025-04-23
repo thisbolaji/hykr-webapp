@@ -291,23 +291,21 @@ const Index = () => {
         </div>
       </section>
       
-      {/* ------------- NEW "Visit hykr.app" Section ------------- */}
+      {/* ------------- "Book a Ride" Section ------------- */}
       <section className="py-12 px-6 bg-[#eef8ff]">
         <div className="max-w-3xl mx-auto rounded-2xl shadow-xl bg-white/80 text-center p-8">
           <h2 className="text-2xl md:text-3xl font-semibold text-hykr-blue mb-3">
-            Trust us with your journey, and we’ll ensure it's the best experience possible.
+            Ready to Experience Seamless Travel?
           </h2>
           <p className="text-lg text-muted-foreground mb-6">
-            Visit <a href="https://hykr.app" target="_blank" rel="noopener noreferrer" className="underline text-primary hover:text-hykr-blue-dark">hykr.app</a> today to learn more!
+            Book your ride with Hykr and enjoy a comfortable, eco-friendly journey.
           </p>
           <Button
             size="lg"
             className="bg-hykr-blue hover:bg-hykr-blue-dark text-white text-lg"
-            asChild
+            onClick={() => navigate("/booking")}
           >
-            <a href="https://hykr.app" target="_blank" rel="noopener noreferrer">
-              Visit hykr.app
-            </a>
+            Book a Ride Now
           </Button>
         </div>
       </section>
