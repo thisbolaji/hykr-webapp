@@ -74,6 +74,28 @@ const Index = () => {
         </div>
       </section>
       
+      {/* ------------- NEW "Change the Narrative" Section ------------- */}
+      <section className="py-16 px-6 bg-[#f5fbff]">
+        <div className="max-w-4xl mx-auto text-center space-y-4">
+          <h2 className="text-3xl md:text-4xl font-bold text-hykr-blue mb-2">Change the Narrative of Long-Distance Journeys</h2>
+          <p className="text-lg text-foreground">
+            HYKR is here to change the narrative of long-distance journeys, making them more memorable and stress-free.
+            <br />
+            Say goodbye to environmental disturbances, flight delays, high travel costs, and all the discomforts that come with traditional travel.
+          </p>
+          <div className="flex justify-center mt-6">
+            <Button
+              size="lg"
+              className="bg-primary hover:bg-hykr-blue-dark text-lg"
+              onClick={() => navigate("/booking")}
+            >
+              Start Planning Your Trip
+            </Button>
+          </div>
+        </div>
+      </section>
+      {/* ------------------------------------------------------------- */}
+
       {/* Features Section */}
       <section className="py-16 px-6 bg-white">
         <div className="max-w-7xl mx-auto text-center mb-12">
@@ -267,6 +289,28 @@ const Index = () => {
         </div>
       </section>
       
+      {/* ------------- NEW "Visit hykr.app" Section ------------- */}
+      <section className="py-12 px-6 bg-[#eef8ff]">
+        <div className="max-w-3xl mx-auto rounded-2xl shadow-xl bg-white/80 text-center p-8">
+          <h2 className="text-2xl md:text-3xl font-semibold text-hykr-blue mb-3">
+            Trust us with your journey, and we’ll ensure it's the best experience possible.
+          </h2>
+          <p className="text-lg text-muted-foreground mb-6">
+            Visit <a href="https://hykr.app" target="_blank" rel="noopener noreferrer" className="underline text-primary hover:text-hykr-blue-dark">hykr.app</a> today to learn more!
+          </p>
+          <Button
+            size="lg"
+            className="bg-hykr-blue hover:bg-hykr-blue-dark text-white text-lg"
+            asChild
+          >
+            <a href="https://hykr.app" target="_blank" rel="noopener noreferrer">
+              Visit hykr.app
+            </a>
+          </Button>
+        </div>
+      </section>
+      {/* -------------------------------------------------------- */}
+
       {/* CTA Section */}
       <section className="py-16 px-6 bg-gradient-to-r from-primary/20 to-[#cee6ff]/20">
         <div className="max-w-7xl mx-auto text-center">
