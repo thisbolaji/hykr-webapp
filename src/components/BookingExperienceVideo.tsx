@@ -2,10 +2,21 @@
 import React from "react";
 
 const BookingExperienceVideo = () => (
-  <section className="w-full relative flex items-center justify-center bg-black overflow-hidden" style={{ minHeight: 500, height: "70vh" }}>
-    {/* Overlay to create a bit of a visual effect and focus */}
+  <section
+    className="w-full relative flex items-center justify-center bg-black overflow-hidden"
+    style={{
+      minHeight: 500,
+      height: 500,
+      maxHeight: 500,
+      width: "100%",
+      maxWidth: 1200,
+      marginLeft: "auto",
+      marginRight: "auto",
+    }}
+  >
+    {/* Overlay for visual focus */}
     <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent z-10 pointer-events-none" />
-    {/* Video */}
+    {/* Responsive Video */}
     <video
       className="w-full h-full object-cover"
       autoPlay
@@ -13,16 +24,18 @@ const BookingExperienceVideo = () => (
       muted
       playsInline
       preload="auto"
-      poster="https://images.unsplash.com/photo-1517841905240-472988babdf9?fit=crop&w=900&q=80"
-      style={{ minHeight: 500, maxHeight: 800 }}
+      poster="https://images.unsplash.com/photo-1517841905240-472988babdf9?fit=crop&w=1200&q=80"
+      style={{
+        width: "100%",
+        height: "100%",
+        minHeight: 500,
+        maxHeight: 500,
+        maxWidth: 1200,
+        objectFit: "cover",
+      }}
     >
-      {/* Replace the src below with your custom ride booking/travel video when available */}
-      <source src="https://videos.pexels.com/video-files/6466786/6466786-hd_1920_1080_24fps.mp4" type="video/mp4" />
+      {/* Replace the src below with your custom MP4 video (landscape, 1200x500) */}
+      <source src="https://player.vimeo.com/external/359331178.sd.mp4?s=994e77dd8b6e2bcf9e43e58011e943853db21f1e&profile_id=164&oauth2_token_id=57447761" type="video/mp4" />
       Your browser does not support the video tag.
     </video>
-    {/* Optional text overlay */}
-    <div className="absolute inset-0 z-20 flex flex-col items-center justify-center text-white">
-      {/* Add heading or branding here if you want, or leave empty for clean look */}
-      {/* <h2 className="text-3xl md:text-4xl font-bold drop-shadow-lg">Seamless Booking Experience</h2> */}
-    </div>
   </section>
