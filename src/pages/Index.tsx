@@ -6,6 +6,7 @@ import HomeHeroMap from "@/components/HomeHeroMap";
 import { Quote, User, Users } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import BeautifulLocationsMarquee from "@/components/BeautifulLocationsMarquee";
+import BookingExperienceVideo from "@/components/BookingExperienceVideo";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -291,7 +292,10 @@ const Index = () => {
           </div>
         </div>
       </section>
-      
+
+      {/* ----- NEW FULL VIDEO SECTION: Booking Experience ----- */}
+      <BookingExperienceVideo />
+
       {/* ------------- "Book a Ride" Section ------------- */}
       <section className="py-12 px-6 bg-[#eef8ff]">
         <div className="max-w-3xl mx-auto rounded-2xl shadow-xl bg-white/80 text-center p-8">
@@ -310,7 +314,6 @@ const Index = () => {
           </Button>
         </div>
       </section>
-      {/* -------------------------------------------------------- */}
 
       {/* ------------------- TESTIMONIALS SECTION ------------------- */}
       <section className="py-16 px-6 bg-[#f5fbff]">
