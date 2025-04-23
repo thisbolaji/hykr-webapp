@@ -1,4 +1,3 @@
-
 import React from "react";
 
 const locations = [
@@ -35,7 +34,7 @@ const locations = [
   {
     name: "Niagara Falls, NY",
     image:
-      "https://images.unsplash.com/photo-1551038247-3d9af20df552?fit=crop&w=900&q=80"
+      "https://images.unsplash.com/photo-1470008169832-bd94e5ade6a4?fit=crop&w=900&q=80"
   },
   {
     name: "Zion National Park, UT",
@@ -54,7 +53,6 @@ const locations = [
   }
 ];
 
-// Duplicating locations 3x to fill space to achieve a seamless loop
 const marqueeLocations = [...locations, ...locations, ...locations];
 
 const Marquee = () => (
