@@ -58,7 +58,7 @@ const locations = [
 const marqueeLocations = [...locations, ...locations, ...locations];
 
 const Marquee = () => (
-  <div className="relative w-full overflow-hidden bg-gradient-to-b from-[#f5fbff] to-white" style={{ height: 750 }}>
+  <div className="relative w-full overflow-hidden bg-gradient-to-b from-[#f5fbff] to-white" style={{ height: 500 }}>
     <div
       className="flex"
       style={{
@@ -75,16 +75,16 @@ const Marquee = () => (
           <img
             src={loc.image}
             alt={loc.name}
-            className="w-[350px] h-[500px] object-cover rounded-3xl shadow-lg border"
+            className="w-[350px] h-[350px] object-cover rounded-3xl shadow-lg border"
             draggable={false}
             style={{
               maxWidth: 350,
               minWidth: 350,
-              minHeight: 500,
-              maxHeight: 500,
+              minHeight: 350,
+              maxHeight: 350,
             }}
           />
-          <span className="mt-6 font-bold text-foreground text-center text-2xl whitespace-nowrap drop-shadow">
+          <span className="mt-4 font-bold text-foreground text-center text-2xl whitespace-nowrap drop-shadow">
             {loc.name}
           </span>
         </div>
@@ -114,4 +114,3 @@ const BeautifulLocationsMarquee = () => (
 );
 
 export default BeautifulLocationsMarquee;
-
