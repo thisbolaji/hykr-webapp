@@ -39,3 +39,6 @@ const BookingExperienceVideo = () => (
       Your browser does not support the video tag.
     </video>
   </section>
+);
+
+export default BookingExperienceVideo;
