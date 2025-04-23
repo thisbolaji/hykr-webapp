@@ -1,6 +1,9 @@
 
 import React from "react";
 
+// NOTE: For <video> playback, the src needs to be a direct .mp4 file URL.
+// Google Drive sharing links won't work in <video> tags. Host your video on a CDN or get a direct mp4 URL.
+
 const BookingExperienceVideo = () => (
   <section
     className="w-full relative flex items-center justify-center bg-black overflow-hidden"
@@ -12,11 +15,12 @@ const BookingExperienceVideo = () => (
       maxWidth: 1200,
       marginLeft: "auto",
       marginRight: "auto",
+      aspectRatio: "1200/500",
     }}
   >
     {/* Overlay for visual focus */}
     <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent z-10 pointer-events-none" />
-    {/* Responsive Video */}
+    {/* Responsive Landscape Video */}
     <video
       className="w-full h-full object-cover"
       autoPlay
@@ -34,7 +38,11 @@ const BookingExperienceVideo = () => (
         objectFit: "cover",
       }}
     >
-      {/* Replace the src below with your custom MP4 video (landscape, 1200x500) */}
+      {/* 
+        TODO: Replace the src below with your landscape .mp4 video url.
+        Example of a direct .mp4 file URL:
+        <source src="https://YOUR-CDN.com/path/to/your-video.mp4" type="video/mp4" />
+      */}
       <source src="https://player.vimeo.com/external/359331178.sd.mp4?s=994e77dd8b6e2bcf9e43e58011e943853db21f1e&profile_id=164&oauth2_token_id=57447761" type="video/mp4" />
       Your browser does not support the video tag.
     </video>
